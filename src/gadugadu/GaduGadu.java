@@ -113,8 +113,8 @@ public class GaduGadu implements Runnable {
 
     @Override
     public void run() {
-        String serverMsg = "";
-        String statusMsg = "";
+        String serverMsg;
+        String statusMsg;
 
         System.out.println("Nowy wątek GADU");
 
@@ -126,8 +126,8 @@ public class GaduGadu implements Runnable {
 
 //                wątek odbierający wiadomość o statusach znajomych
                 if (threadName.equals("statusThread")) {
-                    getStatusesFromServer();                
-                   
+                    getStatusesFromServer();
+
                     statusMsg = GaduGadu.inStatus.readLine();
 
 //            System.out.println("statusMsg: "+statusMsg);
@@ -141,7 +141,7 @@ public class GaduGadu implements Runnable {
                             if (!"".equals(statusMsg)) {
                                 for (String sid : statusMsg.split(" ")) {
                                     if (!"".equals(sid)) {
-                                       // System.out.println("sid: " + sid);
+                                        // System.out.println("sid: " + sid);
                                         int id = Integer.parseInt(sid);
                                         if (u.getUserId() == id) {
                                             u.setOnline(true);
@@ -152,18 +152,17 @@ public class GaduGadu implements Runnable {
                         }
                         updateStatuses();
                     }
-                    
-//                wątek odbierajacy wiadomosci od użytkowników
-                } else if (threadName.equals("messageThread")) { 
-                    serverMsg = GaduGadu.inMessage.readLine();
-                     
-                    if (serverMsg.contains("#MESSAGE")) {
-                        //wiadomosc od jakiegoś użytkownika
-                        System.out.println("WIADOMOSC OD UZYTKOWNIKA: "+serverMsg);
 
-                        int id = 0;
-                        boolean isFriend = false;
-                        User friend = null;
+//                wątek odbierajacy wiadomosci od użytkowników
+                } else if (threadName.equals("messageThread")) {
+                    int id = 0;
+                    boolean isFriend = false;
+
+                    serverMsg = GaduGadu.inMessage.readLine();
+
+                    System.out.println("WIADOMOSC OD UZYTKOWNIKA: " + serverMsg);
+                    if (serverMsg.contains("#MESSAGE")) {
+                        System.out.println("contains #MESSAGE");
 
                         serverMsg = serverMsg.replace("#MESSAGE", "");
                         if (!"".equals(serverMsg)) {
@@ -175,48 +174,43 @@ public class GaduGadu implements Runnable {
                                 }
                             }
                         }
-                        //znajdz znajomego ktory wyslal wiadomosc
+                        //wyszukaj uzytkownika ktory wyslal wiadomosc w tablicy friends
                         for (User u : GaduGadu.me.getFriends()) {
                             if (u.getUserId() == id) {
+                                isFriend = true;
                                 if (!u.getConversation()) {
                                     u.startConversation();
-                                    break;
                                 }
-                                isFriend = true; //nadawca to znajomy
-                                friend = u;
+                                u.getWindow().addMessage(u.getUserName() + " >>> " + serverMsg.replaceFirst(Integer.toString(id), ""));
                             }
                         }
-                        //jesli jest znajomym
-                        User tmpUnknown = null;
-                        
-                        if (isFriend) {
-                            friend.getWindow().addMessage(friend.getUserName()+" >>> "+serverMsg.replaceFirst(Integer.toString(id), ""));
-                        }
-                        //jesli jest nieznajomym uzytkownikiem
-                        else{
-                            boolean exists=false;
-                            for(User u: GaduGadu.me.getUnknownUsers()){
-                                if(u.getUserId()==id){
+
+                        //jesli to nieznajomy
+                        if (!isFriend) {
+                            User unknown = null;
+                            boolean exists = false;
+
+                            for (User u : GaduGadu.me.getUnknownUsers()) {
+                                if (u.getUserId() == id) {
                                     exists = true;
-                                    tmpUnknown = u;
+                                    unknown = u;
                                     break;
                                 }
                             }
-                            //jesli nie ma takiego unknown usera
-                            if(!exists){
-                                User unknown = new User();
-                                unknown.setUserId(id);
-                                unknown.startConversation();
-                                unknown.getWindow().addMessage(serverMsg.replaceFirst(Integer.toString(id), ""));
-                                unknown.getWindow().setConversationName("Unknown: " + Integer.toString(id));
-                                GaduGadu.me.addUnknownUser(unknown);
-                            }
-                            //jesli jest
-                            else{
-                                if(!tmpUnknown.getConversation()){
-                                   tmpUnknown.getWindow().setVisible(true);
+                            
+                            if(exists){
+                                if(!unknown.getConversation()){
+                                    unknown.startConversation();
                                 }
-                                tmpUnknown.getWindow().addMessage(serverMsg.replaceFirst(Integer.toString(id), ""));
+                                unknown.getWindow().addMessage("Unknown >>> "+serverMsg.replaceFirst(Integer.toString(id), ""));
+                            }
+                            else{
+                                User newUnknown = new User();
+                                newUnknown.setUserId(id);
+                                newUnknown.startConversation();
+                                newUnknown.getWindow().addMessage("Unknown >>> "+serverMsg.replaceFirst(Integer.toString(id), ""));
+                                newUnknown.getWindow().setConversationName("Unknown: " + Integer.toString(id));
+                                GaduGadu.me.addUnknownUser(newUnknown);
                             }
                         }
                     }

@@ -5,6 +5,8 @@
  */
 package gadugadu;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import javax.swing.DefaultListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -18,7 +20,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private DefaultListModel onlineListModel;
     private DefaultListModel offlineListModel;
-    
+      
     //wyszukuje użytkownika i włącza okno konwersacji z danym użytkownikiem
     public void startConversation(String name){
         for(User u: GaduGadu.me.getFriends()){
@@ -68,6 +70,13 @@ public class MainForm extends javax.swing.JFrame {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 startConversation(offlineList.getSelectedValue());
+            }
+        });
+        
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                GaduGadu.outMessage.println("#LOGOUT");
             }
         });
         

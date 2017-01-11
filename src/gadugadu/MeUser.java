@@ -6,6 +6,7 @@
 package gadugadu;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 
@@ -15,7 +16,7 @@ import javax.swing.JFrame;
  */
 public class MeUser extends User{
     private ArrayList<User> friends;
-    private ArrayList<User> unknownUsers;
+    private CopyOnWriteArrayList<User> unknownUsers;
     private  ArrayList<User> onlineFriends;
     private  ArrayList<User> offlineFriends;
     
@@ -25,7 +26,7 @@ public class MeUser extends User{
         friends = new ArrayList();
         onlineFriends = new ArrayList();
         offlineFriends = new ArrayList();
-        unknownUsers = new ArrayList();
+        unknownUsers = new CopyOnWriteArrayList<>();
         
         //mainFrame = new MainForm();
     }
@@ -45,6 +46,13 @@ public class MeUser extends User{
     }
     
     public void addFriend(User friend){
+        for(User unknown: GaduGadu.me.getUnknownUsers()){
+            if(unknown.getUserId() == friend.getUserId()){
+                unknown.getWindow().disable();
+                unknown.getWindow().setVisible(false);
+                this.deleteUnknownUser(unknown);
+            }
+        }
         this.friends.add(friend);
     }
     
@@ -110,22 +118,25 @@ public class MeUser extends User{
     /**
      * @return the unknownUsers
      */
-    public ArrayList<User> getUnknownUsers() {
+    public CopyOnWriteArrayList<User> getUnknownUsers() {
         return unknownUsers;
     }
 
     /**
      * @param unknownUsers the unknownUsers to set
      */
-    public void setUnknownUsers(ArrayList<User> unknownUsers) {
+    public void setUnknownUsers(CopyOnWriteArrayList<User> unknownUsers) {
         this.unknownUsers = unknownUsers;
     }
     
      public void addUnknownUser(User unknown){
-        this.friends.add(unknown);
+         //dodaj uzytkownika do tablicy unknown jesli jeszcze go tam nie ma
+        if(!this.getUnknownUsers().contains(unknown)){
+           this.unknownUsers.add(unknown); 
+        }
     }
     
     public void deleteUnknownUser(User unknown){
-        this.friends.remove(unknown);
+        this.unknownUsers.remove(unknown);
     }
 }
