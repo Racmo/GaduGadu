@@ -158,9 +158,8 @@ public class AddFriendForm extends javax.swing.JFrame implements Runnable{
                   serverMsg = in.readLine();
                   System.out.println("Odebrano wiadomosc: "+serverMsg);
                   
-//                GaduGadu.outMessage.println("#SEARCH "+name);
-//                serverMsg = GaduGadu.inMessage.readLine();
-//                System.out.println("Odebrano wiadomosc: "+serverMsg);
+                  socketSearch.close();
+                  
             } catch (IOException ex) {
                 Logger.getLogger(AddFriendForm.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -194,5 +193,6 @@ public class AddFriendForm extends javax.swing.JFrame implements Runnable{
             JOptionPane.showMessageDialog(null, "Błąd.");
         }
         threadActive=false;
+        
     }
 }

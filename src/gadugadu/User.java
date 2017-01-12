@@ -5,18 +5,18 @@
  */
 package gadugadu;
 
-import static java.sql.JDBCType.NULL;
+import java.io.Serializable;
 
 /**
  *
  * @author Monika
  */
-public class User {
+public class User implements Serializable{
     private int userId;
     private String userName;
-    private Boolean online;
-    private Boolean conversation; //informuje czy okno rozmowy z danym uzytkownikiem jest otwarte
-    private ConversationForm window; //okno rozmowy z danym uzytkownikiem
+    private transient Boolean online;
+    private transient Boolean conversation; //informuje czy okno rozmowy z danym uzytkownikiem jest otwarte
+    private transient ConversationForm window; //okno rozmowy z danym uzytkownikiem
 
     public User() {
         this.userId = 0;

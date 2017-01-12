@@ -7,7 +7,17 @@ package gadugadu;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.basic.BasicListUI;
@@ -20,6 +30,8 @@ public class MainForm extends javax.swing.JFrame {
 
     private DefaultListModel onlineListModel;
     private DefaultListModel offlineListModel;
+    private ObjectOutputStream outputFile;
+    private ObjectInputStream inputFile;
       
     //wyszukuje użytkownika i włącza okno konwersacji z danym użytkownikiem
     public void startConversation(String name){
@@ -77,8 +89,43 @@ public class MainForm extends javax.swing.JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 GaduGadu.outMessage.println("#LOGOUT");
+                try {
+                    //zapis do pliku listy znajomych
+                    outputFile = new ObjectOutputStream(new FileOutputStream("save/friendList.ser"));
+                    
+                    outputFile.writeObject(GaduGadu.me.getFriends());
+                    
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(null, "Błąd. Lista znajomych nie została zapisana.");
+                } catch (IOException ex) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                               
             }
         });
+        
+        try {
+            //odczyt z pliku listy zapisanych znajomych użytkowników
+             System.out.println("Ścieżka: "+System.getProperty("user.dir"));
+            inputFile = new ObjectInputStream(new FileInputStream("save/friendList.ser"));
+           
+            ArrayList<User> newUserList = (ArrayList<User>) inputFile.readObject();
+            //uzupelnienie pustych pól:
+            for(User u: newUserList){
+                u.setConversation(false);
+            }
+            GaduGadu.me.setFriends(newUserList);
+            
+               
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Nie znaleziono pliku z listą znajomych.");
+        } catch (IOException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }
     
