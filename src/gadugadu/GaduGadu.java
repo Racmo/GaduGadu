@@ -65,13 +65,21 @@ public class GaduGadu implements Runnable {
      */
     public static void main(String[] args) throws InterruptedException {
 
-        GaduGadu.serverIP = "192.168.5.165";
+        ServerConfigurationForm serverConfigurationForm = new ServerConfigurationForm();
+        serverConfigurationForm.setVisible(true);
+
         Boolean mainWindow = false;
 
         me = new MeUser();
 
-        LoginForm loginForm = new LoginForm();
-        loginForm.setVisible(true);
+        while (true) {
+            if (GaduGadu.serverIP != null) {
+                LoginForm loginForm = new LoginForm();
+                loginForm.setVisible(true);
+                break;
+            }
+            Thread.sleep(10);
+        }
 
         try {
             socket = new Socket(GaduGadu.serverIP, 5001);
@@ -197,18 +205,17 @@ public class GaduGadu implements Runnable {
                                     break;
                                 }
                             }
-                            
-                            if(exists){
-                                if(!unknown.getConversation()){
+
+                            if (exists) {
+                                if (!unknown.getConversation()) {
                                     unknown.startConversation();
                                 }
-                                unknown.getWindow().addMessage("Unknown >>> "+serverMsg.replaceFirst(Integer.toString(id), ""));
-                            }
-                            else{
+                                unknown.getWindow().addMessage("Unknown >>> " + serverMsg.replaceFirst(Integer.toString(id), ""));
+                            } else {
                                 User newUnknown = new User();
                                 newUnknown.setUserId(id);
                                 newUnknown.startConversation();
-                                newUnknown.getWindow().addMessage("Unknown >>> "+serverMsg.replaceFirst(Integer.toString(id), ""));
+                                newUnknown.getWindow().addMessage("Unknown >>> " + serverMsg.replaceFirst(Integer.toString(id), ""));
                                 newUnknown.getWindow().setConversationName("Unknown: " + Integer.toString(id));
                                 GaduGadu.me.addUnknownUser(newUnknown);
                             }
