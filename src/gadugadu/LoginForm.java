@@ -1,10 +1,6 @@
 package gadugadu;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
-import static java.sql.JDBCType.NULL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -14,13 +10,12 @@ import javax.swing.JOptionPane;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author Monika
  */
 public class LoginForm extends javax.swing.JFrame {
-    
+
     /**
      * Creates new form LoginForm
      */
@@ -117,57 +112,60 @@ public class LoginForm extends javax.swing.JFrame {
 
     private void signInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInButtonActionPerformed
         // REJESTRACJA
-        String serverMsg="";
+        String serverMsg = "";
         String login = this.loginText.getText().trim();
         String password = new String(this.passwordText.getPassword());
         password = password.trim();
-        
-        if(!"".equals(login) && !"".equals(password)){
-            try {
-                GaduGadu.outMessage.println("#REGISTER "+login+" "+password);
-                serverMsg = GaduGadu.inMessage.readLine();
-                System.out.println(serverMsg);
-            } catch (IOException ex) {
-                Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+
+        if (!"".equals(login) && !"".equals(password)) {
+            if (!(login.length() > 20 || password.length() > 20)) {
+                try {
+                    GaduGadu.outMessage.println("#REGISTER " + login + " " + password);
+                    serverMsg = GaduGadu.inMessage.read();
+                    System.out.println(serverMsg);
+                } catch (IOException ex) {
+                    Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Login i hasło powinny mieć mniej niż 20 znaków.");
             }
         }
-        if(serverMsg.equals("#OK")){
+        if (serverMsg.equals("#OK")) {
             JOptionPane.showMessageDialog(null, "You were registered successfully.");
-        }
-        else{
+        } else {
             JOptionPane.showMessageDialog(null, "Server error.");
         }
     }//GEN-LAST:event_signInButtonActionPerformed
 
     private void logInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logInButtonActionPerformed
         // LOGOWANIE
-        String serverMsg="";
+        String serverMsg = "";
         String login = this.loginText.getText().trim();
         String password = new String(this.passwordText.getPassword());
         password = password.trim();
-        
-        if(!"".equals(login) && !"".equals(password)){
+
+        if (!"".equals(login) && !"".equals(password)) {
             try {
-                GaduGadu.outMessage.println("#LOGIN "+login+" "+password);
-                serverMsg = GaduGadu.inMessage.readLine();
+                GaduGadu.outMessage.println("#LOGIN " + login + " " + password);
+                serverMsg = GaduGadu.inMessage.read();
                 System.out.println(serverMsg);
             } catch (IOException ex) {
                 Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        if(serverMsg.contains("#OK")){
+        if (serverMsg.contains("#OK")) {
             JOptionPane.showMessageDialog(null, "You are now logged in.");
-            
+
             serverMsg = serverMsg.replace("#OK ", "");
-            
+
             GaduGadu.me.setOnline(true);
             GaduGadu.me.setUserName(login);
             GaduGadu.me.setUserId(Integer.parseInt(serverMsg));
-            
+
             this.setVisible(false);
             this.dispose();
-        }
-        else{
+        } else {
             JOptionPane.showMessageDialog(null, "Wrong password or login.");
         }
     }//GEN-LAST:event_logInButtonActionPerformed
@@ -205,8 +203,7 @@ public class LoginForm extends javax.swing.JFrame {
                 new LoginForm().setVisible(true);
             }
         });
-        
-        
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

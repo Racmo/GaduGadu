@@ -24,13 +24,15 @@ public class GaduGadu implements Runnable {
 
     public static Socket socket;
     public static PrintWriter outMessage;
-    public static BufferedReader inMessage;
+    public static MySocketReader inMessage;
 
     public static Socket statusSocket;
     public static PrintWriter outStatus;
-    public static BufferedReader inStatus;
+    public static MySocketReader inStatus;
 
     public static String serverIP;
+    public static boolean checkStatuses;
+    public static boolean shutdown;
 
     //Wysyła zapytanie o statusy znajomych użytkowników
     public static void getStatusesFromServer() {
@@ -69,6 +71,8 @@ public class GaduGadu implements Runnable {
         serverConfigurationForm.setVisible(true);
 
         Boolean mainWindow = false;
+        checkStatuses = true;
+        shutdown = false;
 
         me = new MeUser();
 
@@ -83,13 +87,16 @@ public class GaduGadu implements Runnable {
 
         try {
             socket = new Socket(GaduGadu.serverIP, 5001);
-            // socket.setSoTimeout(1000);
+            socket.setSoTimeout(0);
             outMessage = new PrintWriter(socket.getOutputStream(), true);
-            inMessage = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
+            BufferedReader inBufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            inMessage = new MySocketReader(inBufferedReader);
+            
             statusSocket = new Socket(GaduGadu.serverIP, 5001);
+            statusSocket.setSoTimeout(0);
             outStatus = new PrintWriter(statusSocket.getOutputStream(), true);
-            inStatus = new BufferedReader(new InputStreamReader(statusSocket.getInputStream()));
+            BufferedReader statusBufferedReader = new BufferedReader(new InputStreamReader(statusSocket.getInputStream()));
+            inStatus = new MySocketReader(statusBufferedReader);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -126,7 +133,7 @@ public class GaduGadu implements Runnable {
 
         System.out.println("Nowy wątek GADU");
 
-        while (true) {
+        while (!shutdown) {
             try {
                 //Nowy wątek
 
@@ -134,9 +141,10 @@ public class GaduGadu implements Runnable {
 
 //                wątek odbierający wiadomość o statusach znajomych
                 if (threadName.equals("statusThread")) {
+                                       
                     getStatusesFromServer();
 
-                    statusMsg = GaduGadu.inStatus.readLine();
+                    statusMsg = GaduGadu.inStatus.read();
 
 //            System.out.println("statusMsg: "+statusMsg);
                     if (statusMsg.contains("#STATUS")) {
@@ -166,7 +174,7 @@ public class GaduGadu implements Runnable {
                     int id = 0;
                     boolean isFriend = false;
 
-                    serverMsg = GaduGadu.inMessage.readLine();
+                    serverMsg = GaduGadu.inMessage.read();
 
                     System.out.println("WIADOMOSC OD UZYTKOWNIKA: " + serverMsg);
                     if (serverMsg.contains("#MESSAGE")) {
@@ -232,6 +240,7 @@ public class GaduGadu implements Runnable {
             }
 
         }
+      
     }
 
 }

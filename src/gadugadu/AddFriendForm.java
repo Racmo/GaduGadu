@@ -152,12 +152,14 @@ public class AddFriendForm extends javax.swing.JFrame implements Runnable{
                   //wyszukiwanie użytkownika w nowym połączeniu;
                   Socket socketSearch = new Socket(GaduGadu.serverIP, 5001);
                   PrintWriter out = new PrintWriter(socketSearch.getOutputStream(), true);
-                  BufferedReader in = new BufferedReader(new InputStreamReader(socketSearch.getInputStream()));
+                  BufferedReader inBufferedReader = new BufferedReader(new InputStreamReader(socketSearch.getInputStream()));
+                  MySocketReader in = new MySocketReader(inBufferedReader);
                   
                   out.println("#SEARCH "+name);
-                  serverMsg = in.readLine();
+                  serverMsg = in.read();
                   System.out.println("Odebrano wiadomosc: "+serverMsg);
                   
+                  out.println("#LOGOUT");
                   socketSearch.close();
                   
             } catch (IOException ex) {

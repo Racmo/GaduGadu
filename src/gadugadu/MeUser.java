@@ -8,7 +8,6 @@ package gadugadu;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
 
 /**
  *

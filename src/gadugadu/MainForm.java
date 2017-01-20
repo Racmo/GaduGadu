@@ -20,7 +20,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.basic.BasicListUI;
 
 /**
  *
@@ -88,7 +87,17 @@ public class MainForm extends javax.swing.JFrame {
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                GaduGadu.checkStatuses = false;
+                GaduGadu.shutdown = true;
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
                 GaduGadu.outMessage.println("#LOGOUT");
+                GaduGadu.outStatus.println("#LOGOUT");
+                 
                 try {
                     //zapis do pliku listy znajomych
                     outputFile = new ObjectOutputStream(new FileOutputStream("save/friendList.ser"));
